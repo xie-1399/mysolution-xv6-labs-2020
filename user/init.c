@@ -1,5 +1,7 @@
 // init: The initial user-level program
-
+/*
+ * 用户态初始化时会将sh（即shell程序）放到内存里去执行
+ */
 #include "kernel/types.h"
 #include "kernel/stat.h"
 #include "kernel/spinlock.h"

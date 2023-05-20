@@ -211,6 +211,9 @@ uchar initcode[] = {
 void
 userinit(void)
 {
+  /*
+   *initcode处的数据会复制到第一个用户进程的内存空间
+   */
   struct proc *p;
 
   p = allocproc();
@@ -331,6 +334,9 @@ reparent(struct proc *p)
 // until its parent calls wait().
 void
 exit(int status)
+/*
+ * 让调用的所有进程释放资源
+ */
 {
   struct proc *p = myproc();
 

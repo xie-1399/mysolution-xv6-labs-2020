@@ -141,6 +141,11 @@ UPROGS=\
 	$U/_fork\
 	$U/_exec\
 	$U/_forkexec\
+	$U/_sleep\
+	$U/_pingpong\
+	$U/_find\
+	$U/_xargs\
+	$U/_primes\
 	$U/_grep\
 	$U/_init\
 	$U/_kill\

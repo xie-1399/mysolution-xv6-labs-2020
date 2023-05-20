@@ -1,6 +1,6 @@
 # Initial process that execs /init.
 # This code runs in user space.
-
+# 将文件init的内容内容放到内存中以用户态去执行
 #include "syscall.h"
 
 # exec(init, argv)

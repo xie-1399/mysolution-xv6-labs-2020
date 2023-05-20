@@ -14,7 +14,6 @@ int main(){
         printf("parent waiting\n");
         wait(&status);
         printf("thr child exited with status %d\n",status);
-
     }
     exit(0);
 }

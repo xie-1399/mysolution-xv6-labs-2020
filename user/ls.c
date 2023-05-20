@@ -3,6 +3,9 @@
 #include "user/user.h"
 #include "kernel/fs.h"
 
+/*
+ * ls 后面可以加目录名也可以加文件名，都会有其对应的输出的格式
+ */
 char*
 fmtname(char *path)
 {
@@ -34,7 +37,7 @@ ls(char *path)
     fprintf(2, "ls: cannot open %s\n", path);
     return;
   }
-
+    //获取文件描述符所代表的文件的状态
   if(fstat(fd, &st) < 0){
     fprintf(2, "ls: cannot stat %s\n", path);
     close(fd);
