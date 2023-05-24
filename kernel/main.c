@@ -28,6 +28,8 @@ main()
     iinit();         // inode cache
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
+
+    //Todo 从内核态将initcode处的数据复制到用户进程的内存空间
     userinit();      // first user process
     __sync_synchronize();
     started = 1;

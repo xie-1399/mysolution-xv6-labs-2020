@@ -2,64 +2,89 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 #include "kernel/fs.h"
-char* fmtname(char *path)
+
+#define STDDER_FILENO 2
+#define O_RDONLY 0
+
+char* fmtname(char * path)
 {
     static char buf[DIRSIZ+1];
     char *p;
 
-    // Find first character after last slash.
-    for(p=path+strlen(path); p >= path && *p != '/'; p--)
-        ;
-    p++;
-
-    // Return blank-padded name.
-    if(strlen(p) >= DIRSIZ)
-        return p;
+    for (p = path + strlen(path); p >= path && *p != '/'; p--);
+    p ++;
+    if (strlen(p) >= DIRSIZ) return p;
     memmove(buf, p, strlen(p));
-    memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
+    buf[strlen(p)] = 0;
     return buf;
 }
 
-//some questions
-
-void print_path(char* path,const char* filename){
-    struct stat st;
+void find(char* path, char *name)
+{
+    char buf[512], *p;
     int fd;
-    char buf[512];
-    if((fd = open(path, 0)) < 0){
-        printf("cannot open %s\n", path);
-        return;
+    struct dirent de;
+    struct stat st;
+
+    if ((fd = open(path, O_RDONLY)) < 0)
+    {
+        fprintf(STDDER_FILENO, "find open %s error\n", path);
+        exit(1);
     }
 
-    if(fstat(fd, &st) < 0){
-        printf("cannot stat %s\n", path);
+    if (fstat(fd, &st) < 0)
+    {
+        fprintf(STDDER_FILENO, "fstat %s error\n", path);
         close(fd);
-        return;
+        exit(1);
     }
-    //递归寻找路径
-    switch (st.type) {
 
-        case T_FILE:
-            if(strcmp(fmtname(path),filename) == 0){
-                printf("%s\n", fmtname(path));
-                return;
+    switch (st.type)
+    {
+        case T_FILE: // if file check the name
+            if (strcmp(fmtname(path), name) == 0) printf("%s\n", path);
+            break;
+
+        case T_DIR: // if directory recursive call find
+            if (strlen(path) + 1 + DIRSIZ + 1 > sizeof(buf))
+            {
+                fprintf(STDDER_FILENO, "find: path too long\n");
+                break;
             }
-        case T_DIR:
-            printf("%s",path);
-            print_path(fmtname(path),filename);
+
+            // add '/'
+            strcpy(buf, path);
+            p = buf + strlen(buf);
+            *p++ = '/';
+
+            while (read(fd, &de, sizeof(de)) == sizeof(de))
+            {
+                // inum == 0 means invalid directory entry
+                if (de.inum == 0) continue;
+
+                // add de.name to path
+                memmove(p, de.name, DIRSIZ);
+                p[DIRSIZ] = 0;
+
+                // don't find . and .. , 这一步比较重要，这个de.name代表的就是目录
+                if (!strcmp(de.name, ".") || !strcmp(de.name, "..")) continue;
+
+                // recursive call find
+                find(buf, name);
+            }
+            break;
     }
-
-
+    close(fd);
 }
 
 
-int main(int argc , char* argv[]){
-    if(argc != 3){
-        printf("Invalid Parameter!");
+int main(int argc, char *argv[])
+{
+    if (argc != 3)
+    {
+        fprintf(STDDER_FILENO, "usage: find <path> <name>\n");
         exit(1);
     }
-    char* path = argv[1];
-    char* filename = argv[2];
-    print_path(path,filename);
+    find(argv[1], argv[2]);
     exit(0);
 }

@@ -40,6 +40,7 @@ sys_wait(void)
 
 uint64
 sys_sbrk(void)
+//可以为进程回收或者分配内存
 {
   int addr;
   int n;

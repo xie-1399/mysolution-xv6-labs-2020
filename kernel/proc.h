@@ -84,6 +84,9 @@ enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
 struct proc {
+    /*
+     * 仅内核可见的进程状态 / 以及用户空间的指令、数据和栈
+     */
   struct spinlock lock;
 
   // p->lock must be held when using these:

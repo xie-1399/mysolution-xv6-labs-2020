@@ -37,7 +37,7 @@ ls(char *path)
     fprintf(2, "ls: cannot open %s\n", path);
     return;
   }
-    //获取文件描述符所代表的文件的状态
+    //将文件的元信息提取出来
   if(fstat(fd, &st) < 0){
     fprintf(2, "ls: cannot stat %s\n", path);
     close(fd);
@@ -49,6 +49,7 @@ ls(char *path)
     printf("%s %d %d %l\n", fmtname(path), st.type, st.ino, st.size);
     break;
 
+    //如果是目录的话,
   case T_DIR:
     if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
       printf("ls: path too long\n");

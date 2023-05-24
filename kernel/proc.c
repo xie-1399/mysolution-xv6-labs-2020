@@ -214,14 +214,14 @@ userinit(void)
   /*
    *initcode处的数据会复制到第一个用户进程的内存空间
    */
-  struct proc *p;
+  struct proc *p; // 一个进程的指针
 
-  p = allocproc();
+  p = allocproc(); // 从进程列表里面找到一个没有使用过的
   initproc = p;
   
   // allocate one user page and copy init's instructions
   // and data into it.
-  uvminit(p->pagetable, initcode, sizeof(initcode));
+  uvminit(p->pagetable, initcode, sizeof(initcode)); //将一段代码装载到页表的0地址处
   p->sz = PGSIZE;
 
   // prepare for the very first "return" from kernel to user.
@@ -278,13 +278,13 @@ fork(void)
   }
   np->sz = p->sz;
 
-  np->parent = p;
+  np->parent = p; //将新创建的子进程指向对应的父进程
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
 
   // Cause fork to return 0 in the child.
-  np->trapframe->a0 = 0;
+  np->trapframe->a0 = 0; //注意这里的寄存器a0存放的是函数的返回值，所以子进程会返回0
 
   // increment reference counts on open file descriptors.
   for(i = 0; i < NOFILE; i++)
